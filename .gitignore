@@ -8,6 +8,9 @@
 *.so
 *.dylib
 
+# vscode
+*.code-workspace
+
 # Test binary, built with `go test -c`
 *.test
 
@@ -23,6 +26,24 @@ go.work.sum
 
 # env file
 .env
+.env.local
+.env.stage
+.env.prod
 
-# exclude bin directory
-bin/*
+# Directory with binary files
+/bin/
+
+# Tests coverage
+coverage.*
+
+# Directory with vendor proto declarations
+/vendor.protogen/
+
+# Certificates and private keys
+/tls/
+
+# Logs
+/logs/
+
+# air tmp directory
+tmp/

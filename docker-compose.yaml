@@ -1,0 +1,52 @@
+services:
+  chat:
+    image: chat:${APP_IMAGE_TAG}
+    container_name: chat
+    env_file:
+      - .env.${ENV}
+    ports:
+      - "${GRPC_SERVER_PORT}:${GRPC_SERVER_PORT}"
+    networks:
+      - service-network
+    depends_on:
+      db-chat:
+        condition: service_healthy
+      migrator-chat:
+        condition: service_completed_successfully
+
+  db-chat:
+    image: postgres:${POSTGRES_IMAGE_TAG}
+    container_name: db-chat
+    env_file:
+      - .env.${ENV}
+    ports:
+      - "${POSTGRES_PORT_LOCAL}:5432"
+    networks:
+      - service-network
+    volumes:
+      - postgres_volume:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 1s
+      timeout: 5s
+      retries: 5
+
+  migrator-chat:
+    image: migrator-chat:${MIGRATOR_IMAGE_TAG}
+    container_name: migrator-chat
+    restart: on-failure
+    environment:
+      DB_HOST: db-chat
+    networks:
+      - service-network
+    depends_on:
+      db-chat:
+        condition: service_healthy
+
+volumes:
+  postgres_volume:
+
+networks:
+  service-network:
+    name: service-net
+    external: true
