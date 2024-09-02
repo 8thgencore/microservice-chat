@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"net"
@@ -33,17 +32,18 @@ func main() {
 		log.Fatalf("failed to serve: %v", err)
 	}
 }
-func (s *server) Create(ctx context.Context, req *pb.CreateChatRequest) (*pb.CreateChatResponse, error) {
-	fmt.Printf("Create chat with users: %+v\n", req.GetUsernames())
-	return &pb.CreateChatResponse{Id: 1}, nil
-}
 
-func (s *server) Delete(ctx context.Context, req *pb.DeleteChatRequest) (*pb.Empty, error) {
-	fmt.Printf("Delete chat: %d\n", req.GetId())
-	return &pb.Empty{}, nil
-}
+// func (s *server) Create(ctx context.Context, req *pb.CreateRequest) (*pb.CreateResponse, error) {
+// 	fmt.Printf("Create chat with users: %+v\n", req.Chat.Usernames())
+// 	return &pb.CreateResponse{Id: 1}, nil
+// }
 
-func (s *server) SendMessage(ctx context.Context, req *pb.SendMessageRequest) (*pb.Empty, error) {
-	fmt.Printf("Send message from %s: %s\n", req.GetFrom(), req.GetText())
-	return &pb.Empty{}, nil
-}
+// func (s *server) Delete(ctx context.Context, req *pb.DeleteRequest) (*pb.Empty, error) {
+// 	fmt.Printf("Delete chat: %d\n", req.GetId())
+// 	return &pb.Empty{}, nil
+// }
+
+// func (s *server) SendMessage(ctx context.Context, req *pb.SendMessageRequest) (*pb.Empty, error) {
+// 	fmt.Printf("Send message from %s: %s\n", req.GetFrom(), req.GetText())
+// 	return &pb.Empty{}, nil
+// }
