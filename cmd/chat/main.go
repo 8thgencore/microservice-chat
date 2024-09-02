@@ -1,49 +1,22 @@
 package main
 
 import (
-	"fmt"
+	"context"
 	"log"
-	"net"
 
-	pb "github.com/8thgencore/microservice-chat/pkg/chat/v1"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
+	"github.com/8thgencore/microservice-chat/internal/app"
 )
 
-const grpcPort = 50052
-
-type server struct {
-	pb.UnimplementedChatV1Server
-}
-
 func main() {
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", grpcPort))
+	ctx := context.Background()
+
+	a, err := app.NewApp(ctx)
 	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
+		log.Fatal("failed to init app: ", error.Error(err))
 	}
 
-	s := grpc.NewServer()
-	reflection.Register(s)
-	pb.RegisterChatV1Server(s, &server{})
-
-	log.Printf("server listening at %v", lis.Addr())
-
-	if err = s.Serve(lis); err != nil {
-		log.Fatalf("failed to serve: %v", err)
+	err = a.Run()
+	if err != nil {
+		log.Fatal("failed to run app: ", error.Error(err))
 	}
 }
-
-// func (s *server) Create(ctx context.Context, req *pb.CreateRequest) (*pb.CreateResponse, error) {
-// 	fmt.Printf("Create chat with users: %+v\n", req.Chat.Usernames())
-// 	return &pb.CreateResponse{Id: 1}, nil
-// }
-
-// func (s *server) Delete(ctx context.Context, req *pb.DeleteRequest) (*pb.Empty, error) {
-// 	fmt.Printf("Delete chat: %d\n", req.GetId())
-// 	return &pb.Empty{}, nil
-// }
-
-// func (s *server) SendMessage(ctx context.Context, req *pb.SendMessageRequest) (*pb.Empty, error) {
-// 	fmt.Printf("Send message from %s: %s\n", req.GetFrom(), req.GetText())
-// 	return &pb.Empty{}, nil
-// }
