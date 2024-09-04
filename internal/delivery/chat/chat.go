@@ -11,14 +11,14 @@ import (
 )
 
 // Connect is used for connecting to a chat.
-func (i *ChatImplementation) Connect(req *chatv1.ConnectRequest, stream chatv1.ChatV1_ConnectServer) error {
+func (i *Implementation) Connect(req *chatv1.ConnectRequest, stream chatv1.ChatV1_ConnectServer) error {
 	err := i.chatService.Connect(req.GetChatId(), req.GetUsername(), converter.ToStreamFromDesc(stream))
 	log.Println(err)
 	return err
 }
 
 // Create is used for creating new chat.
-func (i *ChatImplementation) Create(ctx context.Context, req *chatv1.CreateRequest) (*chatv1.CreateResponse, error) {
+func (i *Implementation) Create(ctx context.Context, req *chatv1.CreateRequest) (*chatv1.CreateResponse, error) {
 	id, err := i.chatService.Create(ctx, converter.ToChatFromDesc(req.GetChat()))
 	if err != nil {
 		return nil, err
@@ -30,7 +30,7 @@ func (i *ChatImplementation) Create(ctx context.Context, req *chatv1.CreateReque
 }
 
 // Delete is used for deleting chat.
-func (i *ChatImplementation) Delete(ctx context.Context, req *chatv1.DeleteRequest) (*empty.Empty, error) {
+func (i *Implementation) Delete(ctx context.Context, req *chatv1.DeleteRequest) (*empty.Empty, error) {
 	err := i.chatService.Delete(ctx, req.GetId())
 	if err != nil {
 		return nil, err
@@ -40,7 +40,7 @@ func (i *ChatImplementation) Delete(ctx context.Context, req *chatv1.DeleteReque
 }
 
 // SendMessage is used for sending messages to connected chat.
-func (i *ChatImplementation) SendMessage(ctx context.Context, req *chatv1.SendMessageRequest) (*empty.Empty, error) {
+func (i *Implementation) SendMessage(ctx context.Context, req *chatv1.SendMessageRequest) (*empty.Empty, error) {
 	err := i.chatService.SendMessage(ctx, req.GetChatId(), converter.ToMessageFromDesc(req.GetMessage()))
 	if err != nil {
 		return nil, err

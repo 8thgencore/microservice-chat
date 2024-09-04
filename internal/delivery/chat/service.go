@@ -5,15 +5,15 @@ import (
 	chatv1 "github.com/8thgencore/microservice-chat/pkg/chat/v1"
 )
 
-// ChatImplementation structure describes API layer.
-type ChatImplementation struct {
+// Implementation structure describes API layer.
+type Implementation struct {
 	chatv1.UnimplementedChatV1Server
 	chatService service.ChatService
 }
 
-// NewChatImplementation creates new object of API layer.
-func NewChatImplementation(chatService service.ChatService) *ChatImplementation {
-	return &ChatImplementation{
+// NewImplementation creates new object of API layer.
+func NewImplementation(chatService service.ChatService) *Implementation {
+	return &Implementation{
 		chatService: chatService,
 	}
 }

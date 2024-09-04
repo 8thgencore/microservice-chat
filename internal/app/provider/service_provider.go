@@ -14,6 +14,7 @@ import (
 	chatService "github.com/8thgencore/microservice-chat/internal/service/chat"
 )
 
+// ServiceProvider is a struct that provides access to various services and repositories.
 type ServiceProvider struct {
 	Config *config.Config
 
@@ -26,16 +27,17 @@ type ServiceProvider struct {
 
 	chatService service.ChatService
 
-	chatImpl *chat.ChatImplementation
+	chatImpl *chat.Implementation
 }
 
+// NewServiceProvider creates a new instance of ServiceProvider with the given configuration.
 func NewServiceProvider(config *config.Config) *ServiceProvider {
 	return &ServiceProvider{
 		Config: config,
 	}
 }
 
-// Repository
+// ChatRepository returns a chat repository.
 func (s *ServiceProvider) ChatRepository(ctx context.Context) repository.ChatRepository {
 	if s.chatRepository == nil {
 		s.chatRepository = chatRepository.NewRepository(s.DatabaseClient(ctx))
@@ -43,6 +45,7 @@ func (s *ServiceProvider) ChatRepository(ctx context.Context) repository.ChatRep
 	return s.chatRepository
 }
 
+// LogRepository returns a log repository.
 func (s *ServiceProvider) LogRepository(ctx context.Context) repository.LogRepository {
 	if s.logRepository == nil {
 		s.logRepository = logRepository.NewRepository(s.DatabaseClient(ctx))
@@ -50,8 +53,8 @@ func (s *ServiceProvider) LogRepository(ctx context.Context) repository.LogRepos
 	return s.logRepository
 }
 
-// Service
-func (s *ServiceProvider) ChatService(ctx context.Context) service.ChatService {
+// ChatService returns a chat service.
+func (s *ServiceProvider) ChatService(_ context.Context) service.ChatService {
 	if s.chatService == nil {
 		s.chatService = chatService.NewService(
 			s.chatRepository,
@@ -63,10 +66,10 @@ func (s *ServiceProvider) ChatService(ctx context.Context) service.ChatService {
 	return s.chatService
 }
 
-// Implementation
-func (s *ServiceProvider) ChatImpl(ctx context.Context) *chat.ChatImplementation {
+// ChatImpl returns a chat api implementation.
+func (s *ServiceProvider) ChatImpl(ctx context.Context) *chat.Implementation {
 	if s.chatImpl == nil {
-		s.chatImpl = chat.NewChatImplementation(s.ChatService(ctx))
+		s.chatImpl = chat.NewImplementation(s.ChatService(ctx))
 	}
 	return s.chatImpl
 }

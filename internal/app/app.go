@@ -9,12 +9,12 @@ import (
 	"github.com/8thgencore/microservice-chat/internal/app/provider"
 	"github.com/8thgencore/microservice-chat/internal/config"
 	"github.com/8thgencore/microservice-chat/internal/interceptor"
+	chatv1 "github.com/8thgencore/microservice-chat/pkg/chat/v1"
 	"github.com/8thgencore/microservice-chat/pkg/closer"
 	"github.com/8thgencore/microservice-chat/pkg/logger"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
-	// chatv1 "github.com/8thgencore/microservice-chat/pkg/chat/v1"
 )
 
 // App structure contains main application structures.
@@ -107,7 +107,7 @@ func (a *App) initGRPCServer(ctx context.Context) error {
 	reflection.Register(a.grpcServer)
 
 	// Register service with corresponded interface.
-	// chatv1.RegisterChatV1Server(a.grpcServer, a.serviceProvider.UserImpl(ctx))
+	chatv1.RegisterChatV1Server(a.grpcServer, a.serviceProvider.ChatImpl(ctx))
 
 	return nil
 }
