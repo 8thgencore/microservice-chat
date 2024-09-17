@@ -7,7 +7,7 @@ import (
 	"github.com/8thgencore/microservice-chat/internal/delivery/chat"
 	"github.com/8thgencore/microservice-chat/internal/repository"
 	"github.com/8thgencore/microservice-chat/internal/service"
-	"github.com/8thgencore/microservice-chat/pkg/db"
+	"github.com/8thgencore/microservice-common/pkg/db"
 
 	chatRepository "github.com/8thgencore/microservice-chat/internal/repository/chat"
 	logRepository "github.com/8thgencore/microservice-chat/internal/repository/log"

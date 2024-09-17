@@ -6,7 +6,7 @@ import (
 
 	"github.com/8thgencore/microservice-chat/internal/model"
 	"github.com/8thgencore/microservice-chat/internal/repository"
-	"github.com/8thgencore/microservice-chat/pkg/db"
+	"github.com/8thgencore/microservice-common/pkg/db"
 	sq "github.com/Masterminds/squirrel"
 )
 
