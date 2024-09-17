@@ -2,6 +2,7 @@ services:
   chat:
     image: chat:${APP_IMAGE_TAG}
     container_name: chat
+    restart: unless-stopped
     env_file:
       - .env.${ENV}
     ports:
@@ -17,10 +18,11 @@ services:
   db-chat:
     image: postgres:${POSTGRES_IMAGE_TAG}
     container_name: db-chat
+    restart: unless-stopped
     env_file:
       - .env.${ENV}
     ports:
-      - "${POSTGRES_PORT_LOCAL}:5432"
+      - "${POSTGRES_PORT_LOCAL}:${POSTGRES_PORT}"
     networks:
       - service-network
     volumes:

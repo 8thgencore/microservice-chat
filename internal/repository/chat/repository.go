@@ -77,6 +77,7 @@ func (r *repo) Delete(ctx context.Context, id string) error {
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 

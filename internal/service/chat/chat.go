@@ -11,7 +11,7 @@ import (
 )
 
 // Connect implements service.ChatService.
-func (s *serv) Connect(chatID string, username string, stream model.Stream) error {
+func (s *chatService) Connect(chatID string, username string, stream model.Stream) error {
 	s.mxChannels.RLock()
 	chatChan, ok := s.channels[chatID]
 	s.mxChannels.RUnlock()
@@ -63,7 +63,7 @@ func (s *serv) Connect(chatID string, username string, stream model.Stream) erro
 	}
 }
 
-func (s *serv) loadHistory(chatID string, stream model.Stream) error {
+func (s *chatService) loadHistory(chatID string, stream model.Stream) error {
 	messages, err := s.messagesRepository.GetMessages(stream.Context(), chatID)
 	if err != nil {
 		return err
@@ -74,12 +74,29 @@ func (s *serv) loadHistory(chatID string, stream model.Stream) error {
 			return err
 		}
 	}
+
 	return nil
 }
 
 // Create implements service.ChatService.
-func (s *serv) Create(ctx context.Context, chat *model.Chat) (string, error) {
+func (s *chatService) Create(ctx context.Context, chat *model.Chat) (string, error) {
 	var id string
+
+	if s.txManager == nil {
+		return "", errors.New("txManager is not initialized")
+	}
+	if s.chatRepository == nil {
+		return "", errors.New("chatRepository is not initialized")
+	}
+	if s.logRepository == nil {
+		return "", errors.New("logRepository is not initialized")
+	}
+	if s.channels == nil {
+		s.channels = make(map[string]chan *model.Message) // initialize channels map
+	}
+	if s.messagesRepository == nil {
+		return "", errors.New("messagesRepository is not initialized")
+	}
 
 	err := s.txManager.ReadCommitted(ctx, func(ctx context.Context) error {
 		var errTx error
@@ -97,7 +114,6 @@ func (s *serv) Create(ctx context.Context, chat *model.Chat) (string, error) {
 
 		return nil
 	})
-
 	if err != nil {
 		log.Print(err)
 		return "", errors.New("failed to create chat")
@@ -110,7 +126,7 @@ func (s *serv) Create(ctx context.Context, chat *model.Chat) (string, error) {
 }
 
 // Delete implements service.ChatService.
-func (s *serv) Delete(ctx context.Context, id string) error {
+func (s *chatService) Delete(ctx context.Context, id string) error {
 	err := s.txManager.ReadCommitted(ctx, func(ctx context.Context) error {
 		var errTx error
 		errTx = s.messagesRepository.DeleteChat(ctx, id)
@@ -139,11 +155,12 @@ func (s *serv) Delete(ctx context.Context, id string) error {
 
 	// Delete channel associated with chat
 	delete(s.channels, id)
+
 	return nil
 }
 
 // InitChannels implements service.ChatService.
-func (s *serv) InitChannels(ctx context.Context) error {
+func (s *chatService) InitChannels(ctx context.Context) error {
 	// Get chats from repository
 	ids, err := s.chatRepository.GetChats(ctx)
 	if err != nil {
@@ -159,7 +176,7 @@ func (s *serv) InitChannels(ctx context.Context) error {
 }
 
 // SendMessage implements service.ChatService.
-func (s *serv) SendMessage(ctx context.Context, chatID string, message *model.Message) error {
+func (s *chatService) SendMessage(ctx context.Context, chatID string, message *model.Message) error {
 	s.mxChannels.RLock()
 	chatChan, ok := s.channels[chatID]
 	s.mxChannels.RUnlock()
@@ -175,5 +192,6 @@ func (s *serv) SendMessage(ctx context.Context, chatID string, message *model.Me
 	}
 
 	chatChan <- message
+
 	return nil
 }

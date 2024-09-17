@@ -11,7 +11,7 @@ import (
 
 const messagesBuffer = 100
 
-type serv struct {
+type chatService struct {
 	chatRepository     repository.ChatRepository
 	messagesRepository repository.MessagesRepository
 	logRepository      repository.LogRepository
@@ -36,7 +36,7 @@ func NewService(
 	logRepository repository.LogRepository,
 	txManager db.TxManager,
 ) service.ChatService {
-	return &serv{
+	return &chatService{
 		chatRepository:     chatRepository,
 		messagesRepository: messagesRepository,
 		logRepository:      logRepository,

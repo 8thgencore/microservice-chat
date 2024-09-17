@@ -1,3 +1,5 @@
+MAKEFLAGS += --no-print-directory
+
 # Check if the ENV variable is set
 ifneq ($(ENV),)
 	include .env.$(ENV)
@@ -11,6 +13,15 @@ LOCAL_BIN:=$(CURDIR)/bin
 LOCAL_MIGRATION_DIR=$(MIGRATION_DIR)
 LOCAL_MIGRATION_DSN="host=localhost port=$(POSTGRES_PORT_LOCAL) dbname=$(POSTGRES_DB) user=$(POSTGRES_USER) password=$(POSTGRES_PASSWORD) sslmode=disable"
 
+# Warning message to ensure correct environment export
+.PHONY: check-env
+check-env:
+ifndef ENV
+	$(error "Please run 'export ENV=dev|stage|prod' and 'export $$(xargs < .env.$(ENV))' before executing make")
+else 
+	@echo "[INFO] Running make with environment: $(ENV)"
+endif
+
 # #################### #
 # DEPENDENCIES & TOOLS #
 # #################### #
@@ -21,14 +32,21 @@ install-deps:
 	GOBIN=$(LOCAL_BIN) go install -mod=mod google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.5.1
 	GOBIN=$(LOCAL_BIN) go install github.com/pressly/goose/v3/cmd/goose@v3.21.1
 	GOBIN=$(LOCAL_BIN) go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.60.3
+	GOBIN=$(LOCAL_BIN) go install mvdan.cc/gofumpt@latest
 	GOBIN=$(LOCAL_BIN) go install github.com/gojuno/minimock/v3/cmd/minimock@v3.4.0
 
+# Fetch Go dependencies
 get-deps:
 	go get -u google.golang.org/protobuf/cmd/protoc-gen-go
 	go get -u google.golang.org/grpc/cmd/protoc-gen-go-grpc
 
+# Linting
 lint:
 	GOBIN=$(LOCAL_BIN) bin/golangci-lint run ./... --config .golangci.pipeline.yaml
+
+# Formating
+format:
+	GOBIN=$(LOCAL_BIN) bin/gofumpt -l -w .
 
 generate-api:
 	make generate-chat-api
@@ -49,14 +67,6 @@ vendor-proto:
 			mv vendor.protogen/protoc-gen-validate/validate/*.proto vendor.protogen/validate &&\
 			rm -rf vendor.protogen/protoc-gen-validate ;\
 		fi
-
-check-env:
-ifeq ($(ENV),)
-	$(error No environment specified)
-endif
-
-run-local:
-	$(LOCAL_BIN)/air
 
 # ##### #
 # BUILD #
@@ -98,3 +108,10 @@ local-migration-down: check-env
 
 docker-stop: check-env
 	docker compose --env-file=.env.$(ENV) down
+
+# ########### #
+# DEVELOPMENT #
+# ########### #
+
+dev:
+	$(LOCAL_BIN)/air

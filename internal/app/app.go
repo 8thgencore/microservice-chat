@@ -70,6 +70,7 @@ func (a *App) initDeps(ctx context.Context) error {
 			return err
 		}
 	}
+
 	return nil
 }
 
@@ -86,7 +87,6 @@ func (a *App) initConfig(_ context.Context) error {
 
 func (a *App) initLogger(_ context.Context) error {
 	logger.Init(string(a.cfg.Env))
-
 	return nil
 }
 
@@ -115,13 +115,12 @@ func (a *App) initGRPCServer(ctx context.Context) error {
 func (a *App) runGrpcServer() error {
 	cfg := a.serviceProvider.Config.GRPC
 
-	// Open IP and port for server.
+	logger.Info("gRPC server running on ", zap.String("address", cfg.Address()))
+
 	lis, err := net.Listen(cfg.Transport, cfg.Address())
 	if err != nil {
 		return err
 	}
-
-	logger.Info("gRPC server running on ", zap.String("address", cfg.Address()))
 
 	err = a.grpcServer.Serve(lis)
 	if err != nil {
