@@ -7,10 +7,11 @@ import (
 	"github.com/8thgencore/microservice-chat/internal/delivery/chat"
 	"github.com/8thgencore/microservice-chat/internal/repository"
 	"github.com/8thgencore/microservice-chat/internal/service"
-	"github.com/8thgencore/microservice-chat/pkg/db"
+	"github.com/8thgencore/microservice-common/pkg/db"
 
 	chatRepository "github.com/8thgencore/microservice-chat/internal/repository/chat"
 	logRepository "github.com/8thgencore/microservice-chat/internal/repository/log"
+	messagesRepository "github.com/8thgencore/microservice-chat/internal/repository/messages"
 	chatService "github.com/8thgencore/microservice-chat/internal/service/chat"
 )
 
@@ -45,6 +46,14 @@ func (s *ServiceProvider) ChatRepository(ctx context.Context) repository.ChatRep
 	return s.chatRepository
 }
 
+// MessagesRepository returns a message repository.
+func (s *ServiceProvider) MessagesRepository(ctx context.Context) repository.MessagesRepository {
+	if s.messagesRepository == nil {
+		s.messagesRepository = messagesRepository.NewRepository(s.DatabaseClient(ctx))
+	}
+	return s.messagesRepository
+}
+
 // LogRepository returns a log repository.
 func (s *ServiceProvider) LogRepository(ctx context.Context) repository.LogRepository {
 	if s.logRepository == nil {
@@ -54,15 +63,16 @@ func (s *ServiceProvider) LogRepository(ctx context.Context) repository.LogRepos
 }
 
 // ChatService returns a chat service.
-func (s *ServiceProvider) ChatService(_ context.Context) service.ChatService {
+func (s *ServiceProvider) ChatService(ctx context.Context) service.ChatService {
 	if s.chatService == nil {
 		s.chatService = chatService.NewService(
-			s.chatRepository,
-			s.messagesRepository,
-			s.logRepository,
-			s.txManager,
+			s.ChatRepository(ctx),
+			s.MessagesRepository(ctx),
+			s.LogRepository(ctx),
+			s.TxManager(ctx),
 		)
 	}
+
 	return s.chatService
 }
 

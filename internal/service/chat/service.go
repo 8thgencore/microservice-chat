@@ -6,12 +6,12 @@ import (
 	"github.com/8thgencore/microservice-chat/internal/model"
 	"github.com/8thgencore/microservice-chat/internal/repository"
 	"github.com/8thgencore/microservice-chat/internal/service"
-	"github.com/8thgencore/microservice-chat/pkg/db"
+	"github.com/8thgencore/microservice-common/pkg/db"
 )
 
 const messagesBuffer = 100
 
-type serv struct {
+type chatService struct {
 	chatRepository     repository.ChatRepository
 	messagesRepository repository.MessagesRepository
 	logRepository      repository.LogRepository
@@ -36,7 +36,7 @@ func NewService(
 	logRepository repository.LogRepository,
 	txManager db.TxManager,
 ) service.ChatService {
-	return &serv{
+	return &chatService{
 		chatRepository:     chatRepository,
 		messagesRepository: messagesRepository,
 		logRepository:      logRepository,

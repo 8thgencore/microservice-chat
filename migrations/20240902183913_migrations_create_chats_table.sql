@@ -1,12 +1,9 @@
 -- +goose Up
 -- +goose StatementBegin
-CREATE TYPE text_array AS ARRAY OF text;
-
-CREATE TABLE
-    IF NOT EXISTS chats (
-        id uuid PRIMARY KEY DEFAULT gen_random_uuid (),
-        usernames text_array
-    );
+CREATE TABLE IF NOT EXISTS chats (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid (),
+    usernames text[]
+);
 
 -- +goose StatementEnd
 -- +goose Down
