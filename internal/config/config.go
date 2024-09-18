@@ -27,9 +27,11 @@ const (
 
 // Config represents the configuration for the application.
 type Config struct {
-	Env      Env `env:"ENV" env-default:"local"`
-	GRPC     GRPC
-	Database DatabaseConfig
+	Env        Env `env:"ENV" env-default:"local"`
+	GRPC       GRPC
+	TLS        TLSConfig
+	Database   DatabaseConfig
+	AuthClient AuthClient
 }
 
 // GRPC represents the configuration for the GRPC server.
@@ -62,13 +64,20 @@ func (c *DatabaseConfig) DSN() string {
 
 // AuthClient represents a client for authenticating users.
 type AuthClient struct {
-	Host string `env:"AUTH_CLIENT_HOST" env-default:"auth"`
-	Port int    `env:"AUTH_CLIENT_PORT" env-default:"50052"`
+	Host     string `env:"AUTH_CLIENT_HOST" env-default:"auth"`
+	Port     int    `env:"AUTH_CLIENT_PORT" env-default:"50052"`
+	CertPath string `env:"AUTH_CERT_PATH"`
 }
 
 // Address returns the address of the authentication server in the format "host:port".
 func (c *AuthClient) Address() string {
 	return net.JoinHostPort(c.Host, strconv.Itoa(c.Port))
+}
+
+// TLSConfig represents the configuration for the TLSConfig.
+type TLSConfig struct {
+	CertPath string `env:"TLS_CERT_PATH"`
+	KeyPath  string `env:"TLS_KEY_PATH"`
 }
 
 // NewConfig creates a new instance of Config

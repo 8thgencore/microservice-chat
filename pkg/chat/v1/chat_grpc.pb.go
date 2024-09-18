@@ -20,10 +20,10 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ChatV1_Create_FullMethodName      = "/chat.ChatV1/Create"
-	ChatV1_Delete_FullMethodName      = "/chat.ChatV1/Delete"
-	ChatV1_Connect_FullMethodName     = "/chat.ChatV1/Connect"
-	ChatV1_SendMessage_FullMethodName = "/chat.ChatV1/SendMessage"
+	ChatV1_Create_FullMethodName      = "/chat_v1.ChatV1/Create"
+	ChatV1_Delete_FullMethodName      = "/chat_v1.ChatV1/Delete"
+	ChatV1_Connect_FullMethodName     = "/chat_v1.ChatV1/Connect"
+	ChatV1_SendMessage_FullMethodName = "/chat_v1.ChatV1/SendMessage"
 )
 
 // ChatV1Client is the client API for ChatV1 service.
@@ -213,7 +213,7 @@ func _ChatV1_SendMessage_Handler(srv interface{}, ctx context.Context, dec func(
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var ChatV1_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "chat.ChatV1",
+	ServiceName: "chat_v1.ChatV1",
 	HandlerType: (*ChatV1Server)(nil),
 	Methods: []grpc.MethodDesc{
 		{
