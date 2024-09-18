@@ -2,9 +2,9 @@ package provider
 
 import (
 	"context"
-	"fmt"
 	"log"
 
+	"github.com/8thgencore/microservice-chat/internal/app/security"
 	"github.com/8thgencore/microservice-chat/internal/client/rpc"
 	"github.com/8thgencore/microservice-chat/internal/config"
 	"github.com/8thgencore/microservice-chat/internal/delivery/chat"
@@ -13,8 +13,6 @@ import (
 	"github.com/8thgencore/microservice-chat/internal/service"
 	"github.com/8thgencore/microservice-common/pkg/db"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
-	"google.golang.org/grpc/credentials/insecure"
 
 	accessv1 "github.com/8thgencore/microservice-auth/pkg/access/v1"
 	rpcAuth "github.com/8thgencore/microservice-chat/internal/client/rpc/auth"
@@ -62,7 +60,7 @@ func (s *ServiceProvider) AuthClient() rpc.AuthClient {
 	}
 
 	// Setup credentials
-	creds, err := s.getTransportCredentials(cfg.CertPath)
+	creds, err := security.LoadClientCredentials(cfg.CertPath)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -80,20 +78,6 @@ func (s *ServiceProvider) AuthClient() rpc.AuthClient {
 	s.authClient = rpcAuth.NewAuthClient(accessv1.NewAccessV1Client(conn))
 
 	return s.authClient
-}
-
-// getTransportCredentials sets up and returns the appropriate transport credentials.
-func (s *ServiceProvider) getTransportCredentials(certPath string) (credentials.TransportCredentials, error) {
-	if certPath != "" {
-		creds, err := credentials.NewClientTLSFromFile(certPath, "")
-		if err != nil {
-			return nil, fmt.Errorf("failed to load TLS credentials: %w", err)
-		}
-		return creds, nil
-	}
-
-	// If no certificate is provided, use insecure credentials (for development or non-production)
-	return insecure.NewCredentials(), nil
 }
 
 // InterceptorClient returns an instance of interceptor.Client.

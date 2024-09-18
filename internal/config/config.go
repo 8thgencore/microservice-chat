@@ -76,7 +76,6 @@ func (c *AuthClient) Address() string {
 
 // TLSConfig represents the configuration for the TLSConfig.
 type TLSConfig struct {
-	Enable   bool   `env:"ENABLE_TLS" env-default:"false"`
 	CertPath string `env:"TLS_CERT_PATH"`
 	KeyPath  string `env:"TLS_KEY_PATH"`
 }

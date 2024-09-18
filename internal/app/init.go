@@ -5,13 +5,12 @@ import (
 	"log"
 
 	"github.com/8thgencore/microservice-chat/internal/app/provider"
+	"github.com/8thgencore/microservice-chat/internal/app/security"
 	"github.com/8thgencore/microservice-chat/internal/config"
 	"github.com/8thgencore/microservice-chat/internal/interceptor"
 	chatv1 "github.com/8thgencore/microservice-chat/pkg/chat/v1"
 	"github.com/8thgencore/microservice-common/pkg/logger"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
-	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
 )
 
@@ -54,16 +53,10 @@ func (a *App) initServiceProvider(_ context.Context) error {
 }
 
 func (a *App) initGRPCServer(ctx context.Context) error {
-	var creds credentials.TransportCredentials
-	var err error
-
-	if a.cfg.TLS.Enable {
-		creds, err = credentials.NewServerTLSFromFile(a.cfg.TLS.CertPath, a.cfg.TLS.KeyPath)
-		if err != nil {
-			return err
-		}
-	} else {
-		creds = insecure.NewCredentials()
+	// Setup credentials
+	creds, err := security.LoadServerCredentials(a.cfg.TLS.CertPath, a.cfg.TLS.KeyPath)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	c := a.serviceProvider.InterceptorClient()
