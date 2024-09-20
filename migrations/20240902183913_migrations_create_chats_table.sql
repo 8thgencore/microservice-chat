@@ -1,9 +1,10 @@
 -- +goose Up
 -- +goose StatementBegin
-CREATE TABLE IF NOT EXISTS chats (
-    id uuid PRIMARY KEY DEFAULT gen_random_uuid (),
-    usernames text[]
-);
+CREATE TABLE
+    IF NOT EXISTS chats (
+        id uuid PRIMARY KEY DEFAULT gen_random_uuid (),
+        usernames text[]
+    );
 
 -- +goose StatementEnd
 -- +goose Down
