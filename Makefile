@@ -72,6 +72,9 @@ vendor-proto:
 # BUILD #
 # ##### #
 
+build-cli:
+	GOOS=linux GOARCH=amd64 go build -o $(LOCAL_BIN)/${CLI_BINARY_NAME} cli/cmd/main.go
+
 build-app:
 	GOOS=linux GOARCH=amd64 go build -o $(LOCAL_BIN)/main cmd/chat/main.go
 
