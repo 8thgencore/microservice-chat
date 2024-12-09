@@ -3,7 +3,7 @@ package auth
 import (
 	"context"
 
-	desc "github.com/8thgencore/microservice-auth/pkg/access/v1"
+	desc "github.com/8thgencore/microservice-auth/pkg/pb/access/v1"
 	"github.com/8thgencore/microservice-chat/internal/client/rpc"
 )
 

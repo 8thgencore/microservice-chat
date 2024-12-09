@@ -11,7 +11,7 @@ LOCAL_BIN:=$(CURDIR)/bin
 
 # Migration settings
 LOCAL_MIGRATION_DIR=$(MIGRATION_DIR)
-LOCAL_MIGRATION_DSN="host=localhost port=$(POSTGRES_PORT_LOCAL) dbname=$(POSTGRES_DB) user=$(POSTGRES_USER) password=$(POSTGRES_PASSWORD) sslmode=disable"
+LOCAL_MIGRATION_DSN="host=localhost port=$(POSTGRES_PORT) dbname=$(POSTGRES_DB) user=$(POSTGRES_USER) password=$(POSTGRES_PASSWORD) sslmode=disable"
 
 # Warning message to ensure correct environment export
 .PHONY: check-env
@@ -28,12 +28,12 @@ endif
 
 install-deps:
 	GOBIN=$(LOCAL_BIN) go install github.com/air-verse/air@latest
-	GOBIN=$(LOCAL_BIN) go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.34.2
+	GOBIN=$(LOCAL_BIN) go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.35.2
 	GOBIN=$(LOCAL_BIN) go install -mod=mod google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.5.1
 	GOBIN=$(LOCAL_BIN) go install github.com/pressly/goose/v3/cmd/goose@v3.21.1
-	GOBIN=$(LOCAL_BIN) go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.60.3
+	GOBIN=$(LOCAL_BIN) go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.62.0
 	GOBIN=$(LOCAL_BIN) go install mvdan.cc/gofumpt@latest
-	GOBIN=$(LOCAL_BIN) go install github.com/gojuno/minimock/v3/cmd/minimock@v3.4.0
+	GOBIN=$(LOCAL_BIN) go install github.com/gojuno/minimock/v3/cmd/minimock@latest
 
 # Fetch Go dependencies
 get-deps:
@@ -54,10 +54,10 @@ generate-api:
 generate-chat-api:
 	mkdir -p pkg/chat/v1
 	protoc --proto_path api/chat/v1 --proto_path vendor.protogen \
-	--go_out=pkg/chat/v1 --go_opt=paths=source_relative \
-	--plugin=protoc-gen-go=$(LOCAL_BIN)/protoc-gen-go \
-	--go-grpc_out=pkg/chat/v1 --go-grpc_opt=paths=source_relative \
-	--plugin=protoc-gen-go-grpc=$(LOCAL_BIN)/protoc-gen-go-grpc \
+		--go_out=pkg/chat/v1 --go_opt=paths=source_relative \
+		--plugin=protoc-gen-go=$(LOCAL_BIN)/protoc-gen-go \
+		--go-grpc_out=pkg/chat/v1 --go-grpc_opt=paths=source_relative \
+		--plugin=protoc-gen-go-grpc=$(LOCAL_BIN)/protoc-gen-go-grpc \
 	api/chat/v1/chat.proto
 
 vendor-proto:
@@ -81,16 +81,16 @@ docker-net:
 docker-build: docker-build-app docker-build-migrator
 
 docker-build-app: check-env
-	docker buildx build --no-cache --platform linux/amd64 -t chat:${APP_IMAGE_TAG} --build-arg="ENV=${ENV}" --build-arg="CONFIG=${CONFIG}" .
+	docker buildx build --no-cache --platform linux/amd64 -t chat:${APP_IMAGE_TAG} .
 
 docker-build-migrator: check-env
-	docker buildx build --no-cache --platform linux/amd64 -t migrator-chat:${MIGRATOR_IMAGE_TAG} -f migrator.Dockerfile --build-arg="ENV=${ENV}" .
+	docker buildx build --no-cache --platform linux/amd64 -t migrator-chat:${MIGRATOR_IMAGE_TAG} -f migrator.Dockerfile .
 
 # ###### #
 # DEPLOY #
 # ###### #
 
-docker-deploy: check-env docker-build
+docker-deploy: check-env
 	docker compose --env-file=.env.$(ENV) up -d
 
 local-migration-status: check-env

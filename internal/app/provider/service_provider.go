@@ -14,7 +14,7 @@ import (
 	"github.com/8thgencore/microservice-common/pkg/db"
 	"google.golang.org/grpc"
 
-	accessv1 "github.com/8thgencore/microservice-auth/pkg/access/v1"
+	accessv1 "github.com/8thgencore/microservice-auth/pkg/pb/access/v1"
 	rpcAuth "github.com/8thgencore/microservice-chat/internal/client/rpc/auth"
 
 	chatRepository "github.com/8thgencore/microservice-chat/internal/repository/chat"

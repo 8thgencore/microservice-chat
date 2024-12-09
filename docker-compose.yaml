@@ -21,14 +21,16 @@ services:
     restart: unless-stopped
     env_file:
       - .env.${ENV}
+    # expose:
+      # - 5432
     ports:
-      - "${POSTGRES_PORT_LOCAL}:${POSTGRES_PORT}"
+      - "${POSTGRES_PORT:-5432}:5432"
     networks:
       - service-network
     volumes:
       - postgres_volume:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 1s
       timeout: 5s
       retries: 5
@@ -37,8 +39,8 @@ services:
     image: migrator-chat:${MIGRATOR_IMAGE_TAG}
     container_name: migrator-chat
     restart: on-failure
-    environment:
-      DB_HOST: db-chat
+    env_file:
+      - .env.${ENV}
     networks:
       - service-network
     depends_on:
