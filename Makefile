@@ -26,11 +26,13 @@ endif
 # DEPENDENCIES & TOOLS #
 # #################### #
 
-install-deps:
-	GOBIN=$(LOCAL_BIN) go install github.com/air-verse/air@latest
+_install-global-deps:
+	go install github.com/air-verse/air@latest
+	go install github.com/pressly/goose/v3/cmd/goose@latest
+
+install-deps: _install-global-deps 
 	GOBIN=$(LOCAL_BIN) go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.35.2
-	GOBIN=$(LOCAL_BIN) go install -mod=mod google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.5.1
-	GOBIN=$(LOCAL_BIN) go install github.com/pressly/goose/v3/cmd/goose@v3.21.1
+	GOBIN=$(LOCAL_BIN) go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.5.1
 	GOBIN=$(LOCAL_BIN) go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.62.0
 	GOBIN=$(LOCAL_BIN) go install mvdan.cc/gofumpt@latest
 	GOBIN=$(LOCAL_BIN) go install github.com/gojuno/minimock/v3/cmd/minimock@latest
@@ -94,13 +96,13 @@ docker-deploy: check-env
 	docker compose --env-file=.env.$(ENV) up -d
 
 local-migration-status: check-env
-	$(LOCAL_BIN)/goose -dir ${LOCAL_MIGRATION_DIR} postgres ${LOCAL_MIGRATION_DSN} status -v
+	goose -dir ${LOCAL_MIGRATION_DIR} postgres ${LOCAL_MIGRATION_DSN} status -v
 
 local-migration-up: check-env
-	$(LOCAL_BIN)/goose -dir ${LOCAL_MIGRATION_DIR} postgres ${LOCAL_MIGRATION_DSN} up -v
+	goose -dir ${LOCAL_MIGRATION_DIR} postgres ${LOCAL_MIGRATION_DSN} up -v
 
 local-migration-down: check-env
-	$(LOCAL_BIN)/goose -dir ${LOCAL_MIGRATION_DIR} postgres ${LOCAL_MIGRATION_DSN} down -v
+	goose -dir ${LOCAL_MIGRATION_DIR} postgres ${LOCAL_MIGRATION_DSN} down -v
 
 # #### #
 # STOP #
@@ -114,4 +116,4 @@ docker-stop: check-env
 # ########### #
 
 dev:
-	$(LOCAL_BIN)/air
+	air

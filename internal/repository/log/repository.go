@@ -44,7 +44,7 @@ func (r *repo) Log(ctx context.Context, text *model.Log) error {
 		QueryRaw: query,
 	}
 
-	var id int64
+	var id string
 	err = r.db.DB().QueryRowContext(ctx, q, args...).Scan(&id)
 	if err != nil {
 		return err
