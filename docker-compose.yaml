@@ -6,7 +6,7 @@ services:
     env_file:
       - .env.${ENV}
     ports:
-      - "${GRPC_SERVER_PORT}:${GRPC_SERVER_PORT}"
+      - ${GRPC_SERVER_PORT}:${GRPC_SERVER_PORT}
     networks:
       - service-network
     depends_on:
@@ -19,12 +19,14 @@ services:
     image: postgres:${POSTGRES_IMAGE_TAG}
     container_name: db-chat
     restart: unless-stopped
-    env_file:
-      - .env.${ENV}
+    environment:
+      POSTGRES_DB: "${DB_NAME}"
+      POSTGRES_USER: "${DB_USER}"
+      POSTGRES_PASSWORD: "${DB_PASSWORD}"
     # expose:
       # - 5432
     ports:
-      - 127.0.0.1:${POSTGRES_EXPOSE_PORT:-15432}:5432
+      - 127.0.0.1:${DB_EXPOSE_PORT:-15432}:5432
     networks:
       - service-network
     volumes:
@@ -39,8 +41,13 @@ services:
     image: migrator-chat:${MIGRATOR_IMAGE_TAG}
     container_name: migrator-chat
     restart: on-failure
-    env_file:
-      - .env.${ENV}
+    environment:
+      DB_HOST: "${DB_HOST}"
+      DB_PORT: "${DB_PORT}"
+      DB_NAME: "${DB_NAME}"
+      DB_USER: "${DB_USER}"
+      DB_PASSWORD: "${DB_PASSWORD}"
+      MIGRATION_DIR: "${MIGRATION_DIR}"
     networks:
       - service-network
     depends_on:
